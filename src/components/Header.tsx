@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Download, CheckCircle2 } from 'lucide-react';
+import { Download, CheckCircle2, Bug } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: string;
@@ -28,10 +28,14 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'code', label: 'Source Code' },
   ];
 
+  // Direct template link to GitHub issues
+  const reportIssueUrl =
+    'https://github.com/pretengineer/FS25_LazyMouseTerrainPainter/issues/new?template=bug_report.yml';
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Zone 1: Single text element wordmark */}
+        {/* Zone 1: Wordmark */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setActiveTab('hud-preview')}
@@ -47,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
-        {/* Zone 2: Clean text navigation links */}
+        {/* Zone 2: Navigation links */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
@@ -67,8 +71,18 @@ export const Header: React.FC<HeaderProps> = ({
           })}
         </nav>
 
-        {/* Zone 3: Primary action button */}
+        {/* Zone 3: Primary action & bug report button */}
         <div className="flex items-center gap-3">
+          <a
+            href={reportIssueUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs font-medium text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-all cursor-pointer"
+          >
+            <Bug className="h-3.5 w-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Report Issue</span>
+          </a>
+
           <button
             onClick={onDownloadZip}
             disabled={isDownloading}
