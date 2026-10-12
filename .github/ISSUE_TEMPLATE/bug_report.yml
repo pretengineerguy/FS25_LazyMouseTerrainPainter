@@ -1,0 +1,22 @@
+---
+name: Bug Report / Feedback
+about: Report a bug or share feedback for Lazy Mouse Terrain Painter
+title: "[BUG/FEEDBACK] "
+labels: ["tester-feedback"]
+---
+
+### Test Environment
+- **Game Version:** FS25 (e.g. 1.2.0.0)
+- **Platform / OS:** Windows 11 / macOS
+- **Display Resolution & Aspect Ratio:** (e.g. 2560x1440 @ 16:9, or 21:9 Ultrawide)
+- **Input Device:** Mouse & Keyboard
+
+### What Were You Doing?
+(e.g. Painting asphalt path, smoothing steep hill, using custom map)
+
+### What Happened?
+(Describe what felt wrong, any visual glitch, or unexpected behavior)
+
+### Relevant `log.txt` lines (if any error occurred):
+```text
+(Paste any errors from Documents/My Games/FarmingSimulator2025/log.txt here)
