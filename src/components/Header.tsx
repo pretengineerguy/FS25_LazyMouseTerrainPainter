@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Direct template link to GitHub issues
   const reportIssueUrl =
-    'https://github.com/pretengineer/FS25_LazyMouseTerrainPainter/issues/new?template=bug_report.yml';
+    'https://github.com/pretengineerguy/FS25_LazyMouseTerrainPainter/issues/new?template=bug_report.yml';
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md">
