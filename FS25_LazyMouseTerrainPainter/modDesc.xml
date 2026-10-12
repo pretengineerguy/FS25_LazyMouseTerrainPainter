@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="94">
+    <title>
+        <en>Lazy Mouse Terrain Painter</en>
+        <de>Lazy Mouse Geländemaler</de>
+        <fr>Lazy Mouse Peintre de Terrain</fr>
+    </title>
+    <description>
+        <en><![CDATA[Smooth landscaping and terrain painting stabilizer for Farming Simulator 25.
+
+Hold Left Alt to engage an elastic tether for steady, clean curves and jitter-free strokes. Eliminates mouse hand tremor, sudden angle snaps, and micro-stutters during ground painting and terrain sculpting.
+
+Features:
+- Momentary Hold stabilization (Left Alt by default)
+- Native 3D GIANTS brush preservation (sizes, shapes, and terrain decals are 100% untouched)
+- Seamless integration with base-game F1 Controls Help Box
+- Rebindable via standard Pause Menu Keyboard Controls
+- Non-destructive hooks for full compatibility with other terrain mods
+- Multiplayer and dedicated server safe]]></en>
+        <de><![CDATA[Stabilisator für Geländebau und Geländemalerei im Landwirtschafts-Simulator 25.
+
+Halten Sie die linke Alt-Taste gedrückt, um eine elastische Zugleine für zitterfreie, saubere Linien zu aktivieren. Verhindert Handzittern, abrupte Kanten und Mikroruckler beim Malen und Modellieren.
+
+Funktionen:
+- Temporäre Glättung beim Halten der linken Alt-Taste
+- Erhält die nativen 3D-GIANTS-Pinselformen und -Projektionen vollständig
+- Nahtlos in das F1-Hilfemenü integriert
+- Frei belegbar in den Tastatureinstellungen
+- Nicht-destruktive Einbindung für maximale Mod-Kompatibilität
+- Multiplayer- und Dedicated-Server-sicher]]></de>
+    </description>
+    <version>1.0.0.0</version>
+    <author>Pretengineer</author>
+    <iconFilename>icon.dds</iconFilename>
+    <multiplayer supported="true"/>
+
+	<extraSourceFiles>
+        <sourceFile filename="scripts/LazyMouseTerrainPainter.lua" />
+    </extraSourceFiles>
+
+    <actions>
+        <action name="LAZYMOUSE_HOLD" category="GENERAL"/>
+        <action name="LAZYMOUSE_INCREASE_RADIUS" category="GENERAL"/>
+        <action name="LAZYMOUSE_DECREASE_RADIUS" category="GENERAL"/>
+    </actions>
+
+    <inputBinding>
+        <actionBinding action="LAZYMOUSE_HOLD">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt" />
+        </actionBinding>
+        <actionBinding action="LAZYMOUSE_INCREASE_RADIUS">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rightbracket" />
+        </actionBinding>
+        <actionBinding action="LAZYMOUSE_DECREASE_RADIUS">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_leftbracket" />
+        </actionBinding>
+    </inputBinding>
+
+    <l10n>
+        <text name="input_LAZYMOUSE_HOLD">
+            <en>Stabilize Stroke (Lazy Mouse)</en>
+            <de>Pinselstrich stabilisieren (Lazy Mouse)</de>
+            <fr>Stabiliser le trait (Lazy Mouse)</fr>
+        </text>
+        <text name="input_LAZYMOUSE_INCREASE_RADIUS">
+            <en>Lazy Mouse: Increase Tether Radius</en>
+            <de>Lazy Mouse: Zugleine vergrößern</de>
+            <fr>Lazy Mouse: Augmenter le rayon</fr>
+        </text>
+        <text name="input_LAZYMOUSE_DECREASE_RADIUS">
+            <en>Lazy Mouse: Decrease Tether Radius</en>
+            <de>Lazy Mouse: Zugleine verkleinern</de>
+            <fr>Lazy Mouse: Réduire le rayon</fr>
+        </text>
+    </l10n>
+</modDesc>

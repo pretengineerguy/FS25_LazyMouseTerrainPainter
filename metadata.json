@@ -1,0 +1,7 @@
+{
+  "name": "FS25 Lazy Mouse Terrain Editor Mod Suite",
+  "description": "Farming Simulator 25 mod featuring a lazy mouse stabilizer for the terrain editor, ground sculpting, leveling, and painting with customizable string length, curve physics, and keybindings.",
+  "author": "Pretengineer",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

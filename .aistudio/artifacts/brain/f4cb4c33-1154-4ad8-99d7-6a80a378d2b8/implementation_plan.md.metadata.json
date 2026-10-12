@@ -1,0 +1,6 @@
+{
+  "summary":  "Implementation plan to align Lazy Mouse with base game FS25 behaviors: evaluate deactivation using primary hardware mouse input when idle (button up), let base game camera autoscroll and stroke logic proceed naturally when active (button down), and instantly release primary mouse upon click release.",
+  "updatedAt":  "2026-10-02T15:33:06.542149011Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}
