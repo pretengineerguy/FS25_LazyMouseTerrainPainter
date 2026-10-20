@@ -1,13 +1,7 @@
 -- ====================================================================
 -- Lazy Mouse Terrain Painter (FS25 / GIANTS Engine 10)
--- RELEASE BUILD V2.6: Fixed Tab Detection & Primary Mouse Autoscroll
+-- RELEASE BUILD V2.7: Decoupled Trailing Anchor & Edge Autoscroll
 -- Author: Pretengineer
---
--- ROADMAP / FUTURE UPDATES:
--- [ ] Gamepad/Controller Support:
---     - Add InputAction mapping for gamepad hold (e.g. LB/L1) in modDesc.xml.
---     - Poll g_inputBinding:getIsInputActive() alongside hardware keyEvent.
---     - Add D-Pad Left/Right radius adjustment when in gamepad input mode.
 -- ====================================================================
 
 LazyMouseTerrainPainter = {}
@@ -44,36 +38,45 @@ function LazyMouseTerrainPainter:isLandscapingActive(screenSelf)
 
     -- 1. Tab enum check if explicitly set by GIANTS ConstructionScreen
     if ConstructionScreen ~= nil and ConstructionScreen.TAB_LANDSCAPING ~= nil then
-        if screenSelf.selectedTab == ConstructionScreen.TAB_LANDSCAPING or screenSelf.currentTab == ConstructionScreen.TAB_LANDSCAPING then
+        if screenSelf.selectedTab == ConstructionScreen.TAB_LANDSCAPING
+            or screenSelf.currentTab == ConstructionScreen.TAB_LANDSCAPING then
             return true
         end
     end
 
     -- 2. Inspect category name labels
-    local label = screenSelf.selectedTabName or screenSelf.currentTabName or screenSelf.currentCategoryName or screenSelf.selectedCategoryName
+    local label = screenSelf.selectedTabName
+        or screenSelf.currentTabName
+        or screenSelf.currentCategoryName
+        or screenSelf.selectedCategoryName
+
     if label ~= nil and type(label) == "string" then
         local lowerLabel = string.lower(label)
-        if string.find(lowerLabel, "landscap") ~= nil or string.find(lowerLabel, "sculpt") ~= nil or string.find(lowerLabel, "paint") ~= nil then
+        if string.find(lowerLabel, "landscap") ~= nil
+            or string.find(lowerLabel, "sculpt") ~= nil
+            or string.find(lowerLabel, "paint") ~= nil then
             return true
         end
+
         -- Explicit non-landscaping categories
-if string.find(lowerLabel, "build") ~= nil
+        if string.find(lowerLabel, "build") ~= nil
             or string.find(lowerLabel, "product") ~= nil
             or string.find(lowerLabel, "animal") ~= nil
             or string.find(lowerLabel, "decor") ~= nil
-            or string.find(lowerLabel, "shed") ~= nil then            return false
+            or string.find(lowerLabel, "shed") ~= nil then
+            return false
         end
     end
 
     -- 3. Check for active terrain sculpting/painting tool in currentBrush
     local brush = screenSelf.currentBrush or screenSelf.brush
     if brush ~= nil then
-        if brush.type ~= nil or (brush.cursor ~= nil and brush.cursor.isActive == true and brush.cursor.isVisible == true) then
+        if brush.type ~= nil
+            or (brush.cursor ~= nil and brush.cursor.isActive == true and brush.cursor.isVisible == true) then
             return true
         end
     end
 
-    -- Default fallback: active to preserve core functionality if UI structure changes
     return true
 end
 
@@ -89,8 +92,7 @@ function LazyMouseTerrainPainter:tryHookConstructionScreen()
     end
 
     if targetScreen ~= nil then
-        
-        -- 1. Hook Mouse Event (Feeds smoothed anchor to brush + Primary mouse to camera autoscroll)
+        -- 1. Hook Mouse Event
         local origMouseEvent = targetScreen.mouseEvent
         targetScreen.mouseEvent = function(screenSelf, posX, posY, isDown, isUp, button, eventUsed)
             LazyMouseTerrainPainter.cursorScreenX = posX
@@ -98,7 +100,7 @@ function LazyMouseTerrainPainter:tryHookConstructionScreen()
 
             local isLandscaping = LazyMouseTerrainPainter:isLandscapingActive(screenSelf)
 
-            -- If Alt is not held or not in Landscaping, pass raw coordinates natively
+            -- Pass raw coordinates if smoothing is inactive
             if not LazyMouseTerrainPainter.isHoldActive or not isLandscaping then
                 LazyMouseTerrainPainter.anchorScreenX = posX
                 LazyMouseTerrainPainter.anchorScreenY = posY
@@ -108,7 +110,7 @@ function LazyMouseTerrainPainter:tryHookConstructionScreen()
                 return
             end
 
-            -- 2D Tether Physics Smoothing
+            -- 2D Elastic Tether Math
             local aspectRatio = g_screenAspectRatio or (16 / 9)
             local deltaX = (posX - LazyMouseTerrainPainter.anchorScreenX) * aspectRatio
             local deltaY = posY - LazyMouseTerrainPainter.anchorScreenY
@@ -121,33 +123,53 @@ function LazyMouseTerrainPainter:tryHookConstructionScreen()
                 LazyMouseTerrainPainter.anchorScreenY = posY - (unitY * LazyMouseTerrainPainter.tetherRadius)
             end
 
-            -- Step A: Feed smoothed anchor coordinates into the base game for brush manipulation
+            -- Dispatch ONLY smoothed anchor coordinates to the game logic and brush raycast
             local ret = nil
             if origMouseEvent ~= nil then
-                ret = origMouseEvent(screenSelf, LazyMouseTerrainPainter.anchorScreenX, LazyMouseTerrainPainter.anchorScreenY, isDown, isUp, button, eventUsed)
+                ret = origMouseEvent(
+                    screenSelf,
+                    LazyMouseTerrainPainter.anchorScreenX,
+                    LazyMouseTerrainPainter.anchorScreenY,
+                    isDown,
+                    isUp,
+                    button,
+                    eventUsed
+                )
             end
 
-            -- Step B: Re-feed PRIMARY hardware cursor to the camera for edge autoscrolling
-            -- (Never modify screenSelf.mousePosX/Y directly so the brush remains on the anchor)
+            -- Edge Autoscroll Support:
+            -- Check hardware mouse proximity to borders without firing cam:mouseEvent
             local cam = screenSelf.camera or screenSelf.topDownCamera or screenSelf.guiTopDownCamera
             if cam == nil and screenSelf.target ~= nil then
                 cam = screenSelf.target.camera or screenSelf.target.topDownCamera
             end
 
-            if cam ~= nil then
-                if cam.mouseEvent ~= nil then
-                    cam:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
+            if cam ~= nil and cam.scrollBorderWidth ~= nil and cam.moveSpeed ~= nil then
+                local borderWidth = cam.scrollBorderWidth or 0.015
+                local moveX = 0
+                local moveZ = 0
+
+                if posX < borderWidth then
+                    moveX = -1
+                elseif posX > (1.0 - borderWidth) then
+                    moveX = 1
                 end
-                cam.mousePosX = posX
-                cam.mousePosY = posY
-                if cam.lastMousePosX ~= nil then cam.lastMousePosX = posX end
-                if cam.lastMousePosY ~= nil then cam.lastMousePosY = posY end
+
+                if posY < borderWidth then
+                    moveZ = -1
+                elseif posY > (1.0 - borderWidth) then
+                    moveZ = 1
+                end
+
+                if (moveX ~= 0 or moveZ ~= 0) and cam.move ~= nil then
+                    cam:move(moveX, 0, moveZ)
+                end
             end
 
             return ret
         end
 
-        -- 2. Hook Key Event (Activation & Length adjustment)
+        -- 2. Hook Key Event
         local origKeyEvent = targetScreen.keyEvent
         targetScreen.keyEvent = function(screenSelf, unicode, sym, modifier, isDown)
             local isLandscaping = LazyMouseTerrainPainter:isLandscapingActive(screenSelf)
@@ -162,24 +184,34 @@ function LazyMouseTerrainPainter:tryHookConstructionScreen()
                 else
                     LazyMouseTerrainPainter.isHoldActive = false
                 end
-                
-                if origKeyEvent ~= nil then return origKeyEvent(screenSelf, unicode, sym, modifier, isDown) end
+
+                if origKeyEvent ~= nil then
+                    return origKeyEvent(screenSelf, unicode, sym, modifier, isDown)
+                end
                 return false
-            
+
             elseif isDown and LazyMouseTerrainPainter.isHoldActive and isLandscaping then
                 if sym == Input.KEY_rbracket or sym == 93 then
-                    LazyMouseTerrainPainter.tetherRadius = math.min(LazyMouseTerrainPainter.MAX_RADIUS, LazyMouseTerrainPainter.tetherRadius + LazyMouseTerrainPainter.RADIUS_STEP)
+                    LazyMouseTerrainPainter.tetherRadius = math.min(
+                        LazyMouseTerrainPainter.MAX_RADIUS,
+                        LazyMouseTerrainPainter.tetherRadius + LazyMouseTerrainPainter.RADIUS_STEP
+                    )
                     return true
                 elseif sym == Input.KEY_lbracket or sym == 91 then
-                    LazyMouseTerrainPainter.tetherRadius = math.max(LazyMouseTerrainPainter.MIN_RADIUS, LazyMouseTerrainPainter.tetherRadius - LazyMouseTerrainPainter.RADIUS_STEP)
+                    LazyMouseTerrainPainter.tetherRadius = math.max(
+                        LazyMouseTerrainPainter.MIN_RADIUS,
+                        LazyMouseTerrainPainter.tetherRadius - LazyMouseTerrainPainter.RADIUS_STEP
+                    )
                     return true
                 end
             end
-            
-            if origKeyEvent ~= nil then return origKeyEvent(screenSelf, unicode, sym, modifier, isDown) end
+
+            if origKeyEvent ~= nil then
+                return origKeyEvent(screenSelf, unicode, sym, modifier, isDown)
+            end
         end
 
-        -- 3. Hook Draw Event (Tether rendering)
+        -- 3. Hook Draw Event (Tether overlay rendering)
         local origDraw = targetScreen.draw
         targetScreen.draw = function(screenSelf)
             if origDraw ~= nil then origDraw(screenSelf) end
@@ -187,17 +219,21 @@ function LazyMouseTerrainPainter:tryHookConstructionScreen()
                 LazyMouseTerrainPainter:drawTether()
             end
         end
-        
-        -- 4. Hook Update Event (Context-aware F1 Help Integration)
+
+        -- 4. Hook Update Event (F1 Help Display)
         local origUpdate = targetScreen.update
         targetScreen.update = function(screenSelf, dt)
             if origUpdate ~= nil then origUpdate(screenSelf, dt) end
-            
+
             if g_currentMission ~= nil and g_currentMission.addExtraPrintText ~= nil then
                 if LazyMouseTerrainPainter:isLandscapingActive(screenSelf) then
                     if LazyMouseTerrainPainter.isHoldActive then
                         g_currentMission:addExtraPrintText("Lazy Mouse: ACTIVE")
-                        g_currentMission:addExtraPrintText(string.format("Tether Length: %.1f  [ [ / ] ]", LazyMouseTerrainPainter.tetherRadius * 100))
+                        local lengthText = string.format(
+                            "Tether Length: %.1f  [ [ / ] ]",
+                            LazyMouseTerrainPainter.tetherRadius * 100
+                        )
+                        g_currentMission:addExtraPrintText(lengthText)
                     else
                         g_currentMission:addExtraPrintText("Lazy Mouse: Hold [Left Alt] to Stabilise")
                     end
@@ -213,7 +249,6 @@ end
 
 function LazyMouseTerrainPainter:update(dt)
     if g_dedicatedServer then return end
-    
     if not self.hasHookedConstruction then
         self:tryHookConstructionScreen()
     end
