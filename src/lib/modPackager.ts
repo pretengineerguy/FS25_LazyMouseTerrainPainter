@@ -6,7 +6,8 @@
 import JSZip from 'jszip';
 import modDescXml from '../../FS25_LazyMouseTerrainPainter/modDesc.xml?raw';
 import luaScript from '../../FS25_LazyMouseTerrainPainter/scripts/LazyMouseTerrainPainter.lua?raw';
-import iconDdsUrl from "../../FS25_LazyMouseTerrainPainter/icon_LazyMouseTerrainPainter.dds?url";
+import iconDdsUrl from '../../FS25_LazyMouseTerrainPainter/icon_LazyMouseTerrainPainter.dds?url';
+
 export { modDescXml, luaScript };
 
 export const installationReadmeText = `========================================================================
@@ -18,7 +19,7 @@ Engine Target: GIANTS Engine 10 / Farming Simulator 25 (Patch 1.24+)
 
 ABOUT
 ------------------------------------------------------------------------
-Lazy Mouse Terrain Painter introduces a precision stroke-stabilization
+Lazy Mouse Terrain Painter introduces a precision stroke-stabilisation
 tether to Farming Simulator 25's Construction screen Landscaping modes.
 
 Eliminates hand tremor, sudden angle snaps, and micro-stutters when
@@ -44,7 +45,7 @@ KEY ARCHITECTURAL HIGHLIGHTS
 
 CONTROLS & KEYBINDINGS
 ------------------------------------------------------------------------
-- Hold [Left Alt]: Stabilize stroke (Momentary Hold)
+- Hold [Left Alt]: Stabilise stroke (Momentary Hold)
 - Press [ ] ]: Increase tether radius (+0.005)
 - Press [ [ ]: Decrease tether radius (-0.005)
 
@@ -67,7 +68,7 @@ crossplay multiplayer sessions.
 
 /**
  * Packages the pre-existing files in FS25_LazyMouseTerrainPainter/ directly
- * into an authentic mod archive without generating synthetic dummy files.
+ * into an authentic, GDN TestRunner-compliant mod archive.
  */
 export async function buildProductionModZip(): Promise<Blob> {
   const zip = new JSZip();
@@ -78,21 +79,20 @@ export async function buildProductionModZip(): Promise<Blob> {
   // 2. scripts/LazyMouseTerrainPainter.lua (verbatim from FS25_LazyMouseTerrainPainter/scripts/LazyMouseTerrainPainter.lua)
   zip.file('scripts/LazyMouseTerrainPainter.lua', luaScript);
 
-  // 3. icon.dds (verbatim binary from FS25_LazyMouseTerrainPainter/icon.dds)
+  // 3. icon_LazyMouseTerrainPainter.dds (compliant icon naming convention)
   try {
     const res = await fetch(iconDdsUrl);
     if (!res.ok) {
-      throw new Error(`Failed to fetch icon.dds: ${res.statusText}`);
+      throw new Error(`Failed to fetch icon_LazyMouseTerrainPainter.dds: ${res.statusText}`);
     }
     const arrayBuffer = await res.arrayBuffer();
-    zip.file('icon.dds', arrayBuffer);
+    zip.file('icon_LazyMouseTerrainPainter.dds', arrayBuffer);
   } catch (err) {
-    console.error('Failed to bundle icon.dds asset:', err);
+    console.error('Failed to bundle icon_LazyMouseTerrainPainter.dds asset:', err);
   }
 
-  // 4. Documentation
-  zip.file('README.txt', installationReadmeText);
-  zip.file('INSTALLATION.md', installationReadmeText);
+  // Pure mod package: Documentation files (.md / .txt) are deliberately excluded
+  // to pass GIANTS ObsoleteFiles validation rules.
 
   return await zip.generateAsync({
     type: 'blob',
