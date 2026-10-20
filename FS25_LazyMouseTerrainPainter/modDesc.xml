@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="94">
+<modDesc descVersion="113">
     <title>
         <en>Lazy Mouse Terrain Painter</en>
         <de>Lazy Mouse Geländemaler</de>
-        <fr>Lazy Mouse Peintre de Terrain</fr>
+        <fr>Lazy Mouse Peintre De Terrain</fr>
     </title>
     <description>
         <en><![CDATA[Smooth landscaping and terrain painting stabilizer for Farming Simulator 25.
@@ -31,7 +31,7 @@ Funktionen:
     </description>
     <version>1.0.0.0</version>
     <author>Pretengineer</author>
-    <iconFilename>icon.dds</iconFilename>
+    <iconFilename>icon_LazyMouseTerrainPainter.dds</iconFilename>
     <multiplayer supported="true"/>
 
 	<extraSourceFiles>
