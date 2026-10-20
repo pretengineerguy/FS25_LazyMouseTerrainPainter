@@ -6,8 +6,7 @@
 import JSZip from 'jszip';
 import modDescXml from '../../FS25_LazyMouseTerrainPainter/modDesc.xml?raw';
 import luaScript from '../../FS25_LazyMouseTerrainPainter/scripts/LazyMouseTerrainPainter.lua?raw';
-import iconDdsUrl from '../../FS25_LazyMouseTerrainPainter/icon.dds?url';
-
+import iconDdsUrl from "../../FS25_LazyMouseTerrainPainter/icon_LazyMouseTerrainPainter.dds?url";
 export { modDescXml, luaScript };
 
 export const installationReadmeText = `========================================================================
