@@ -57,8 +57,11 @@ function LazyMouseTerrainPainter:isLandscapingActive(screenSelf)
             return true
         end
         -- Explicit non-landscaping categories
-        if string.find(lowerLabel, "build") ~= nil or string.find(lowerLabel, "product") ~= nil or string.find(lowerLabel, "animal") ~= nil or string.find(lowerLabel, "decor") ~= nil or string.find(lowerLabel, "shed") ~= nil then
-            return false
+if string.find(lowerLabel, "build") ~= nil
+            or string.find(lowerLabel, "product") ~= nil
+            or string.find(lowerLabel, "animal") ~= nil
+            or string.find(lowerLabel, "decor") ~= nil
+            or string.find(lowerLabel, "shed") ~= nil then            return false
         end
     end
 
