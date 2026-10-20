@@ -28,6 +28,17 @@ Funktionen:
 - Frei belegbar in den Tastatureinstellungen
 - Nicht-destruktive Einbindung für maximale Mod-Kompatibilität
 - Multiplayer- und Dedicated-Server-sicher]]></de>
+		<fr><![CDATA[Stabilisateur de lissage pour l'aménagement paysager et la peinture de terrain sur Farming Simulator 25.
+
+Maintenez Alt Gauche pour activer un câble élastique permettant de tracer des courbes nettes et régulières, sans aucun tremblement. Élimine les tremblements de la souris, les décrochages angulaires soudains et les micro-saccades lors de la peinture au sol et de la sculpture du relief.
+
+Caractéristiques :
+- Stabilisation temporaire par maintien de touche (Alt Gauche par défaut)
+- Préservation des pinceaux 3D natifs de GIANTS (tailles, formes et décalcomanies de terrain conservés à 100 %)
+- Intégration transparente avec la boîte d'aide des commandes F1 du jeu de base
+- Touches réassignables via le menu de pause standard (Configuration des commandes clavier)
+- Crochets non destructifs pour une compatibilité totale avec les autres mods de terrain
+- Compatible et sécurisé pour le multijoueur ainsi que les serveurs dédiés]]></fr>
     </description>
     <version>1.0.0.0</version>
     <author>Pretengineer</author>
